@@ -57,6 +57,7 @@ class Bundler extends EventEmitter {
     this.buildQueue = new PromiseQueue(this.processAsset.bind(this));
     this.rebuildTimeout = null;
 
+    this.logger = logger;
     logger.setOptions(this.options);
   }
 

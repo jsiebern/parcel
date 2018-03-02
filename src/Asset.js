@@ -7,7 +7,15 @@ const isURL = require('./utils/is-url');
 const sanitizeFilename = require('sanitize-filename');
 const config = require('./utils/config');
 
-let ASSET_ID = 1;
+let ASSET_IDS = new Map();
+const GET_ASSET_ID = ident => {
+  if (!ASSET_IDS.has(ident)) {
+    ASSET_IDS.set(ident, 0);
+  }
+  const nVal = ASSET_IDS.get(ident) + 1;
+  ASSET_IDS.set(ident, nVal);
+  return nVal;
+};
 
 /**
  * An Asset represents a file in the dependency tree. Assets can have multiple
@@ -17,7 +25,7 @@ let ASSET_ID = 1;
  */
 class Asset {
   constructor(name, pkg, options) {
-    this.id = ASSET_ID++;
+    this.id = GET_ASSET_ID(options.rootDir);
     this.name = name;
     this.basename = path.basename(this.name);
     this.relativeName = path.relative(options.rootDir, this.name);
@@ -53,7 +61,7 @@ class Asset {
       }
     }
 
-    return md5(this.name);
+    return md5(this.name || '');
   }
 
   shouldInvalidate() {
